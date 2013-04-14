@@ -216,17 +216,17 @@ void cc_to_n64()
       // a button
        n64_buffer[0] |= 0x80;
     }
-    else if (wiiClassy.bPressed()) 
+    if (wiiClassy.bPressed()) 
     {
       // b button
       n64_buffer[0] |= 0x40;
     }
-    else if (wiiClassy.leftShoulderPressed()) 
+    if (wiiClassy.leftShoulderPressed()) 
     {
       // z button for n64 or left shoulder for classic
        n64_buffer[0] |= 0x20;
     }
-    else if (wiiClassy.startPressed()) 
+    if (wiiClassy.startPressed()) 
     {
       // start
        n64_buffer[0] |= 0x10;
@@ -238,42 +238,42 @@ void cc_to_n64()
       // r button for n64 or right shoulder for classic
        n64_buffer[1] |= 0x10;
     }
-    else if (wiiClassy.xPressed()) 
+    if (wiiClassy.xPressed()) 
     {
       // c-right for n64 or x for classic
       n64_buffer[1] |= 0x01;
     }
-    else if (wiiClassy.yPressed()) 
+    if (wiiClassy.yPressed()) 
     {
       // c-left for n64 or y for classic
       n64_buffer[1] |= 0x02;
     }
-    else if(wiiClassy.rzPressed())
+    if(wiiClassy.rzPressed())
     {
       // c-down for n64 or rz for classic
       n64_buffer[1] |= 0x04;
     }
-    else if(wiiClassy.lzPressed())
+    if(wiiClassy.lzPressed())
     {
       // c-down for n64 or lz for classic
       n64_buffer[1] |= 0x04;
     }
-    else if(wiiClassy.rightStickX() > 21)
+    if(wiiClassy.rightStickX() > 21)
     {
       // c-right for n64 or right stick right for classic
       n64_buffer[1] |= 0x01;
     }
-    else if(wiiClassy.rightStickX() < 11)
+    if(wiiClassy.rightStickX() < 11)
     {
       // c-left for n64 or right stick left for classic
        n64_buffer[1] |= 0x02;
     }
-    else if(wiiClassy.rightStickY() < 11)
+    if(wiiClassy.rightStickY() < 11)
     {
       // c-down for n64 or right stick down for classic
       n64_buffer[1] |= 0x04;
     }
-    else if(wiiClassy.rightStickY() > 21)
+    if(wiiClassy.rightStickY() > 21)
     {
       // c-up for n64 or right stick down for classic
       n64_buffer[1] |= 0x08;
