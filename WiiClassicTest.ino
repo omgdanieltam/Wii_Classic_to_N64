@@ -282,16 +282,9 @@ void cc_to_n64()
     // third and fourth byte (control stick)
     // the classic controller pro reads the values of the stick as default of (32:x and 30:y [by my tests, I'm assuming it's 0 to 64 with 32 as center])
     // the n64 takes in a signed int from -80 to 80 as a default of 0
-    // will subtract the value by 32 (default classic) and multiply by 4 giving us the proper value
+    // will subtract the value by 32 (default classic) and multiply by 2.5 giving us the proper value range
     n64_buffer[2] = ((wiiClassy.leftStickX()- 32) * 2.5);
     n64_buffer[3] = ((wiiClassy.leftStickY()- 32) * 2.5);
-    
-    // second method to test is to set the values of the stick from 128 as the center
-    /*
-    n64_buffer[2] = (wiiClassy.leftStickX() * 4);
-    n64_buffer[3] = (wiiClassy.leftStickY() * 4);
-    
-    */
 }
 
 // copied and pasted the second half as the first is merely assign button presses to bytes
