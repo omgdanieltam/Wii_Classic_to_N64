@@ -205,107 +205,58 @@ inner_loop:
 
 boolean lightStatus;
 int read_buffer[4];
-String serialPrint = "";
 
-// convert the CCP data to n64 data and output to serial for onscreen controller
 void cc_to_n64()
 {
   wiiClassy.update();
-  serialPrint = "";
   
     // First byte
     if (wiiClassy.aPressed()) 
     {
       // a button
        n64_buffer[0] |= 0x80;
-       serialPrint = serialPrint + "1";
-    }
-    else
-    {
-      serialPrint = serialPrint + "0";
     }
     if (wiiClassy.bPressed()) 
     {
       // b button
       n64_buffer[0] |= 0x40;
-      serialPrint = serialPrint + "1";
-    }
-    else
-    {
-      serialPrint = serialPrint + "0";
     }
     if (wiiClassy.leftShoulderPressed()) 
     {
       // z button for n64 or left shoulder for classic
        n64_buffer[0] |= 0x20;
-       serialPrint = serialPrint + "1";
-    }
-    else
-    {
-      serialPrint = serialPrint + "0";
     }
     if (wiiClassy.startPressed()) 
     {
       // start
        n64_buffer[0] |= 0x10;
-       serialPrint = serialPrint + "1";
     }
-    else
-    {
-      serialPrint = serialPrint + "0";
-    }
-    
     
     // Second Byte
     if (wiiClassy.rightShoulderPressed()) 
     {
       // r button for n64 or right shoulder for classic
        n64_buffer[1] |= 0x10;
-       serialPrint = serialPrint + "1";
-    }
-    else
-    {
-      serialPrint = serialPrint + "0";
     }
     if (wiiClassy.xPressed()) 
     {
       // c-right for n64 or x for classic
       n64_buffer[1] |= 0x01;
-      serialPrint = serialPrint + "1";
-    }
-    else
-    {
-      serialPrint = serialPrint + "0";
     }
     if (wiiClassy.yPressed()) 
     {
       // c-left for n64 or y for classic
       n64_buffer[1] |= 0x02;
-      serialPrint = serialPrint + "1";
-    }
-    else
-    {
-      serialPrint = serialPrint + "0";
     }
     if(wiiClassy.rzPressed())
     {
       // c-down for n64 or rz for classic
       n64_buffer[1] |= 0x04;
-      serialPrint = serialPrint + "1";
-    }
-    else
-    {
-      serialPrint = serialPrint + "0";
     }
     if(wiiClassy.lzPressed())
     {
       // c-down for n64 or lz for classic
       n64_buffer[1] |= 0x04;
-      serialPrint = serialPrint + "1";
-    }
-    else
-    {
-      serialPrint = serialPrint + "0";
     }
     if(wiiClassy.rightStickX() > 21)
     {
@@ -332,29 +283,8 @@ void cc_to_n64()
     // the classic controller pro reads the values of the stick as default of (32:x and 30:y [by my tests, I'm assuming it's 0 to 64 with 32 as center])
     // the n64 takes in a signed int from -80 to 80 as a default of 0
     // will subtract the value by 32 (default classic) and multiply by 2.5 giving us the proper value range
-    n64_buffer[2] = ((wiiClassy.leftStickX()- 32) * 2.8);
-    n64_buffer[3] = ((wiiClassy.leftStickY()- 30) * 2.8);
-    
-    // priting pure stick values
-    serialPrint = serialPrint + " ";
-    serialPrint = serialPrint + wiiClassy.leftStickX();
-    serialPrint = serialPrint + " ";
-    serialPrint = serialPrint + wiiClassy.leftStickY();
-    serialPrint = serialPrint + " ";
-    serialPrint = serialPrint + wiiClassy.rightStickX();
-    serialPrint = serialPrint + " ";
-    serialPrint = serialPrint + wiiClassy.rightStickY();
-    serialPrint = serialPrint + "\n";
-    
-    // check for total time and print if it's more than 100 milliseconds
-    /*unsigned long currentMilli = millis();
-    if(currentMilli - prevMilli > interval)
-    {
-      prevMilli = currentMilli;
-      Serial.print(serialPrint);
-    }*/
-    //delay(100);
-    Serial.print(serialPrint);
+    n64_buffer[2] = ((wiiClassy.leftStickX()- 32) * 2.5);
+    n64_buffer[3] = ((wiiClassy.leftStickY()- 32) * 2.5);
 }
 
 // copied and pasted the second half as the first is merely assign button presses to bytes
@@ -364,7 +294,6 @@ void loop()
   memset(n64_buffer, 0, sizeof(n64_buffer));
 
     cc_to_n64();
-    
     
     // COPIED AND PASTED FROM THIS POINT
   
