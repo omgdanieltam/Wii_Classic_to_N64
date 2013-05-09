@@ -17,6 +17,7 @@ WIRING
 ===============================
 
 How to correctly hook the wires up
+
 CCP SCL -> Analog 5
 
 CCP SDA -> Analog 4
