@@ -5,7 +5,7 @@ by: Daniel Tam
 
 INTRODUCTION
 ===============================
-The idea for this project was brought out by Moltov, a Zelda OoT speedrunner.
+The idea for this project was brought out by Moltov, a Legend of Zelda: Ocarina of Time (OoT) speedrunner.
 Since he used a classic controller pro (referred to as CCP from this point) to run OoT, he couldn't have used a N64 to run the game.
 This is written so that the CCP can be read and outputted as a N64 controller.
 This was written and tested using Osepp's Uno board (based off of Arduino Uno using the same ATmega358 chip).
