@@ -8,6 +8,10 @@ This was written and tested using Osepp's Uno board (based off of Arduino Uno us
 Final product will be used on the same board.
 
 Much of the code is copied and pasted with only slight variations in code.
+
+9/4/14
+New EEPROM added to change the sensitivity of the stick on the go
+Switched the if statements back to xor statements
 ===============================
 
 ============ WIRING ============
