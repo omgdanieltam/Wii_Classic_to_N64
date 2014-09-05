@@ -28,9 +28,10 @@ B : B
 X : C-Right
 Y : C-Left
 R : R
-L : L
+L : Z
 RZ/LZ : C-Down
 + : Start
+- : Programmer (dpad left/dpad right)
 Right Stick Up : C-Up
 Right Stick Down: C-Down
 Right Stick Left : C-Left
@@ -47,6 +48,7 @@ Right Stick Right: C-Right
 #include "Wire.h"
 #include "WiiClassic.h"
 #include "crc_table.h"
+#include <EEPROM.h>
 
 #define N64_PIN 8
 #define N64_HIGH DDRB &= ~0x01
@@ -67,11 +69,20 @@ void get_n64_command();
 // Classic controller library
 WiiClassic wiiClassy = WiiClassic();
 
+// Left stick multiplier
+double multiplier = 2.8;
+
 void setup() 
-{
+{ 
   // Setup the classic controller
   Wire.begin();
   Serial.begin(9600);
+  int readValue = EEPROM.read(0);
+  
+  // set the multiplier
+  if(readValue != 255)
+    multiplier = (readValue + 200) / 100;
+    
   wiiClassy.begin();
   wiiClassy.update();
   
@@ -210,81 +221,99 @@ void cc_to_n64()
 {
   wiiClassy.update();
   
-    // First byte
-    if (wiiClassy.aPressed()) 
+    /***********
+    ** BYTE 1 **
+    ***********/
+    // A, B, Z, Start, Dup, Ddown, Dleft, Dright
+  
+    // Classic A to N64 A
+    n64_buffer[0] |= wiiClassy.aPressed() << 7;
+    
+    // Classic B to N64 B
+    n64_buffer[0] |= wiiClassy.bPressed() << 6;
+      
+    // Classic L to N64 Z
+    n64_buffer[0] |= wiiClassy.leftShoulderPressed() << 5;
+
+    // Classic Start to N64 Start
+    n64_buffer[0] |= wiiClassy.startPressed() << 4;
+
+    
+    /***********
+    ** BYTE 2 **
+    ***********/
+    // 0, 0, L, R, Cup, Cdown, Cleft, Cright
+    
+    // Classic Dleft to N64 L
+    n64_buffer[1] |= wiiClassy.leftDPressed() << 5;
+    
+    // Classic Dright to N64 L
+    n64_buffer[1] |= wiiClassy.rightDPressed() << 5;
+    
+    // Classic Dup to N64 L
+    n64_buffer[1] |= wiiClassy.upDPressed() << 5;
+      
+    // Classic Ddown to N64 L
+    n64_buffer[1] |= wiiClassy.downDPressed() << 5;
+    
+    // Classic R to N64 R
+    n64_buffer[1] |= wiiClassy.rightShoulderPressed() << 4;
+       
+    // Classic Right Stick Up to N64 C-Up
+    if(wiiClassy.rightStickY() > 21)
+      n64_buffer[1] |= 0x08;
+      
+    // Classic Right Stick Down to N64 C-Down
+    if(wiiClassy.rightStickY() < 11)
+      n64_buffer[1] |= 0x04;
+
+    // Classic RZ to N64 C-Down
+    n64_buffer[1] |= wiiClassy.rzPressed() << 2;
+      
+    // Classic LZ to N64 C-Down
+    n64_buffer[1] |= wiiClassy.lzPressed() << 2;                
+    
+    // Classic Right Stick Left to N64 C-Left
+    if(wiiClassy.rightStickX() < 11)
+       n64_buffer[1] |= 0x02;
+    
+    // Classic Y to N64 C-Left
+    n64_buffer[1] |= wiiClassy.yPressed() << 1;
+          
+    // Classic X to N64 C-Right
+    n64_buffer[1] |= wiiClassy.xPressed();
+      
+    // Classic Right Stick Right to N64 C-Right
+    if(wiiClassy.rightStickX() > 21)
+      n64_buffer[1] |= 0x01;
+      
+    // in order to make the controller a bit more dynamic, let the user increase or decrease the senstivitiy by .5
+    // if the minus button and the dpad is used together
+    if(wiiClassy.rightDPressed() && wiiClassy.selectPressed())
+      if(multiplier < 3)
+        multiplier += .5;
+
+    if(wiiClassy.leftDPressed() && wiiClassy.selectPressed())
+      if(multiplier > 2.5)
+        multiplier -= .5;
+    
+    if(wiiClassy.upDPressed() && wiiClassy.selectPressed())
     {
-      // a button
-       n64_buffer[0] |= 0x80;
-    }
-    if (wiiClassy.bPressed()) 
-    {
-      // b button
-      n64_buffer[0] |= 0x40;
-    }
-    if (wiiClassy.leftShoulderPressed()) 
-    {
-      // z button for n64 or left shoulder for classic
-       n64_buffer[0] |= 0x20;
-    }
-    if (wiiClassy.startPressed()) 
-    {
-      // start
-       n64_buffer[0] |= 0x10;
+      multiplier = ((EEPROM.read(0)) + 200) / 100;
     }
     
-    // Second Byte
-    if (wiiClassy.rightShoulderPressed()) 
-    {
-      // r button for n64 or right shoulder for classic
-       n64_buffer[1] |= 0x10;
-    }
-    if (wiiClassy.xPressed()) 
-    {
-      // c-right for n64 or x for classic
-      n64_buffer[1] |= 0x01;
-    }
-    if (wiiClassy.yPressed()) 
-    {
-      // c-left for n64 or y for classic
-      n64_buffer[1] |= 0x02;
-    }
-    if(wiiClassy.rzPressed())
-    {
-      // c-down for n64 or rz for classic
-      n64_buffer[1] |= 0x04;
-    }
-    if(wiiClassy.lzPressed())
-    {
-      // c-down for n64 or lz for classic
-      n64_buffer[1] |= 0x04;
-    }
-    if(wiiClassy.rightStickX() > 21)
-    {
-      // c-right for n64 or right stick right for classic
-      n64_buffer[1] |= 0x01;
-    }
-    if(wiiClassy.rightStickX() < 11)
-    {
-      // c-left for n64 or right stick left for classic
-       n64_buffer[1] |= 0x02;
-    }
-    if(wiiClassy.rightStickY() < 11)
-    {
-      // c-down for n64 or right stick down for classic
-      n64_buffer[1] |= 0x04;
-    }
-    if(wiiClassy.rightStickY() > 21)
-    {
-      // c-up for n64 or right stick down for classic
-      n64_buffer[1] |= 0x08;
-    }
+    if(wiiClassy.downDPressed() && wiiClassy.selectPressed())
+      EEPROM.write(0, ((multiplier * 100) - 200));
+        
+    if(wiiClassy.homePressed() && wiiClassy.selectPressed())
+      multiplier = 2.8;
     
     // third and fourth byte (control stick)
     // the classic controller pro reads the values of the stick as default of (32:x and 30:y [by my tests, I'm assuming it's 0 to 64 with 32 as center])
     // the n64 takes in a signed int from -80 to 80 as a default of 0
     // will subtract the value by 32 (default classic) and multiply by 2.5 giving us the proper value range
-    n64_buffer[2] = ((wiiClassy.leftStickX()- 32) * 2.5);
-    n64_buffer[3] = ((wiiClassy.leftStickY()- 32) * 2.5);
+    n64_buffer[2] = ((wiiClassy.leftStickX()- 32) * multiplier);
+    n64_buffer[3] = ((wiiClassy.leftStickY()- 32) * multiplier);
 }
 
 // copied and pasted the second half as the first is merely assign button presses to bytes
