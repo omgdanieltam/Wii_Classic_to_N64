@@ -1,4 +1,4 @@
-WiiClassicTest
+Wii Classic to N64
 ==============
 Classic Controller Pro to N64 Adapter  
 by: Daniel Tam
