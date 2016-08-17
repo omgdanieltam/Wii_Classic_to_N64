@@ -71,3 +71,4 @@ SOURCES
 
 (Tim Hirzel) http://playground.arduino.cc/Main/WiiClassicController -- Wii Classic Controller to Arduino
 
+(NicoHood) https://github.com/NicoHood -- Not used but an updated version of Andrew Brown's code
